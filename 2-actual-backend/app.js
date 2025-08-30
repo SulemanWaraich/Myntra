@@ -1,4 +1,6 @@
 const express = require('express');
+import path from "path";
+import { fileURLToPath } from "url";
 const bodyParser = require('body-parser');
 
 const { getStoredItems, storeItems } = require('./data/items');
@@ -36,6 +38,17 @@ app.post('/items', async (req, res) => {
   const updatedItems = [newItem, ...existingItems];
   await storeItems(updatedItems);
   res.status(201).json({ message: 'Stored new item.', item: newItem });
+});
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static React build
+app.use(express.static(path.join(__dirname, "../3-myntra-react-clone/build")));
+
+// All other routes → React index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../3-myntra-react-clone/build", "index.html"));
 });
 
 app.listen(8080);
