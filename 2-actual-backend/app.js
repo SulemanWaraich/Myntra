@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
 
 const { getStoredItems, storeItems } = require('./data/items');
 
@@ -8,7 +7,6 @@ const app = express();
 
 app.use(bodyParser.json());
 
-// CORS setup
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST');
@@ -16,10 +14,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// --- API routes ---
+
 app.get('/items', async (req, res) => {
   const storedItems = await getStoredItems();
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  await new Promise((resolve, reject) => setTimeout(() => resolve(), 2000));
   res.json({ items: storedItems });
 });
 
@@ -41,15 +39,4 @@ app.post('/items', async (req, res) => {
   res.status(201).json({ message: 'Stored new item.', item: newItem });
 });
 
-// --- Serve React build (after APIs) ---
-app.use(express.static(path.join(__dirname, "../3-myntra-react-clone/build")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../3-myntra-react-clone/build", "index.html"));
-});
-
-// --- Port setup ---
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(8080);
